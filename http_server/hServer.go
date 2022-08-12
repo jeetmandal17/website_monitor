@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"sync"
-	"time"
+	// "sync"
+	//"time"
 
 	"github.com/monitorServer/commons"
 	"github.com/monitorServer/http_server/data"
@@ -24,17 +24,10 @@ func main(){
 	})
 
 	// Initiazlize the map
-	newWebsitesList := []string{"www.google.com","www.facebook.com","xyz"}
+	newWebsitesList := []string{"https://www.google.com","https://www.facebook.com","https://xyz"}
 	data.InitializeMap(newWebsitesList)
 
-	// For synchronization 
-	wg := new(sync.WaitGroup)
-
 	// Read from the Kafka topic
-	wg.Add(1)
-		go data.ReadFromTopic(r, ctx)
-	
-	time.Sleep(11*time.Second)
+	go data.ReadFromTopic(r, ctx)
 	data.AccessAllData()
-	wg.Wait()
 }

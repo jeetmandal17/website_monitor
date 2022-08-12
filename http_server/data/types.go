@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"time"
 
 	kafka "github.com/segmentio/kafka-go"
 )
@@ -31,9 +32,14 @@ func AccessQueryData(queryWebsite string) {
 
 // Function for accessing all the websites
 func AccessAllData() {
+
 	//Display all the data from the websites
-	for key := range responseCollections{
-		fmt.Println("URL : ", key, " Active : ", responseCollections[key])
+	for {
+		for key := range responseCollections{
+			fmt.Println("Website URL : ", key, " Active : ", responseCollections[key])
+		}
+		fmt.Println("-------------------------------------------")
+		time.Sleep(5*time.Second)
 	}
 }
 
@@ -47,7 +53,6 @@ func ReadFromTopic(r *kafka.Reader, ctx context.Context){
 			fmt.Println("cannot read from the kafka queue")
 			continue
 		}
-		// fmt.Println("Message->  Offset : ", msg.Offset, " URL : ", string(msg.Key), "Status : ", string(msg.Value))
 		convBool, _ := strconv.ParseBool(string(msg.Value))
 		responseCollections[string(msg.Key)] = convBool
 	}
