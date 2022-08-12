@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"strconv"
-	"time"
+	// "fmt"
+	// "strconv"
+	// "time"
 
 	"github.com/monitorServer/commons"
 	"github.com/monitorServer/monitor_server/types"
@@ -29,24 +29,5 @@ func main(){
 	types.AddWebsites(newWebsitesList)
 
 	// Run the go routine to ping the server every 1 minute
-	for {
-		finalResponses := types.PingWebsites()
-
-		for _, item := range finalResponses{
-			fmt.Println("URL : ", item.URL, "Status : ", item.Active)
-			// Write this response into the Kafka Topic
-			err := w.WriteMessages(ctx, kafka.Message{
-				Key: []byte(item.URL),
-				Value: []byte(strconv.FormatBool(item.Active)),
-			},
-			)
-
-			if err != nil {
-				fmt.Println("Cannot Write the message into Kafka Topic")
-			}
-		}
-
-		//Repeat this every minute
-		time.Sleep(10*time.Second) 
-	}
+	types.WriteIntoTopic(w, ctx)
 }

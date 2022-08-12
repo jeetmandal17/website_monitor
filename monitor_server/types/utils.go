@@ -1,12 +1,17 @@
 package types
 
 import (
+	"context"
 	"fmt"
 	"net/http"
+	"strconv"
+	"time"
+
+	kafka "github.com/segmentio/kafka-go"
 )
 
 // Make a in-memory storage to save the websites to be monitored
-// GLOBAL Array
+// IN_MEMORY storage
 var websiteCollection []Website
 
 // Utility to add a website in the in-memory list
@@ -66,4 +71,28 @@ func WebsiteStatusUpdate(URL string) (*WebsiteResponse, error) {
 
 	// Check for the responses and return the ResponseStructure
 	return NewResponseWebsite(httpURL, true), nil
+}
+
+// Go Routine to write the message into the Kafka Topic
+func WriteIntoTopic(w *kafka.Writer, ctx context.Context) {
+	for {
+		finalResponses := PingWebsites()
+
+		for _, item := range finalResponses{
+			fmt.Println("URL : ", item.URL, "Status : ", item.Active)
+			// Write this response into the Kafka Topic
+			err := w.WriteMessages(ctx, kafka.Message{
+				Key: []byte(item.URL),
+				Value: []byte(strconv.FormatBool(item.Active)),
+			},
+			)
+
+			if err != nil {
+				fmt.Println("Cannot Write the message into Kafka Topic")
+			}
+		}
+
+		//Repeat this every minute
+		time.Sleep(10*time.Second) 
+	}
 }

@@ -2,9 +2,11 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"sync"
+	"time"
 
 	"github.com/monitorServer/commons"
+	"github.com/monitorServer/http_server/data"
 	kafka "github.com/segmentio/kafka-go"
 )
 
@@ -13,6 +15,7 @@ func main(){
 	// This interacts with the monitor_server via kafka server
 	// Initialize the context
 	ctx := context.Background()
+
 	// Initialize the kafka reader for the respective topic
 
 	r := kafka.NewReader(kafka.ReaderConfig{
@@ -20,13 +23,18 @@ func main(){
 		Topic: commons.ResponseTopic,
 	})
 
-	// Read from the kafka topic at given intervals and display the message
-	for {
-		msg, err := r.ReadMessage(ctx)
-		if err != nil {
-			fmt.Println("cannot read from the kafka queue")
-			continue
-		}
-		fmt.Println("Message->  Offset : ", msg.Offset, " URL : ", string(msg.Key), "Status : ", string(msg.Value))
-	}
+	// Initiazlize the map
+	newWebsitesList := []string{"www.google.com","www.facebook.com","xyz"}
+	data.InitializeMap(newWebsitesList)
+
+	// For synchronization 
+	wg := new(sync.WaitGroup)
+
+	// Read from the Kafka topic
+	wg.Add(1)
+		go data.ReadFromTopic(r, ctx)
+	
+	time.Sleep(11*time.Second)
+	data.AccessAllData()
+	wg.Wait()
 }
