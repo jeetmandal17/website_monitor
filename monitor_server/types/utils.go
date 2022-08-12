@@ -57,21 +57,13 @@ func WebsiteStatusUpdate(URL string) (*WebsiteResponse, error) {
 
 	// Here we ping the individual website for status
 	httpURL := "https://" + URL
-	resp, err := http.Get(httpURL)
+	_, err := http.Get(httpURL)
 
 	// Check for the errors 
 	if err != nil {
-		fmt.Println("failed to connect to the URL", http.StatusBadRequest)
-		return nil, err
+		return NewResponseWebsite(httpURL, false), nil
 	}
-
-	// Close the response body via the client
-	defer resp.Body.Close()
 
 	// Check for the responses and return the ResponseStructure
-	if resp.StatusCode >= 200 && resp.StatusCode <= 299 {
-		return NewResponseWebsite(httpURL, true), nil
-	}
-
-	return NewResponseWebsite(httpURL, false), nil
+	return NewResponseWebsite(httpURL, true), nil
 }
