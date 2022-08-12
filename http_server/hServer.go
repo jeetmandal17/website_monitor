@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	// "sync"
-	//"time"
+	"time"
 
 	"github.com/monitorServer/commons"
 	"github.com/monitorServer/http_server/data"
@@ -29,5 +29,6 @@ func main(){
 
 	// Read from the Kafka topic
 	go data.ReadFromTopic(r, ctx)
-	data.AccessAllData()
+	time.Sleep(20*time.Second)
+	data.AccessQueryData("https://www.facebook.com")
 }

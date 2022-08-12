@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
-	"time"
+	// "time"
 
 	kafka "github.com/segmentio/kafka-go"
 )
@@ -34,13 +34,11 @@ func AccessQueryData(queryWebsite string) {
 func AccessAllData() {
 
 	//Display all the data from the websites
-	for {
-		for key := range responseCollections{
-			fmt.Println("Website URL : ", key, " Active : ", responseCollections[key])
-		}
-		fmt.Println("-------------------------------------------")
-		time.Sleep(5*time.Second)
+	for key := range responseCollections{
+		fmt.Println("Website URL : ", key, " Active : ", responseCollections[key])
 	}
+	fmt.Println("-------------------------------------------")
+
 }
 
 // Function to read from the Kafka queue
